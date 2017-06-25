@@ -1,0 +1,3 @@
+[submodule "strobe-tuner"]
+	path = strobe-tuner
+	url = https://github.com/cactorium/strobetuner-js
