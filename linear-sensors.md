@@ -27,6 +27,7 @@ The analysis is done by both digital and analog means, because the microcontroll
 
 The phase analysis is done using the [CORDIC algorithm](https://en.wikipedia.org/wiki/CORDIC), which has the benefit of not requiring any multiplication or division.
 The sampled and filtered sine wave is multiplied against a sine wave at 1kHz and a cosine wave at 1 kHz to form I (in-phase) and Q (quadrature) components.
+1 kHz was chosen as a compromise between having a high enough frequency to easily filter out low frequency noise, while also still being able to sample it fast enough to accurately determine its phase.
 These components are summed over a set number of cycles to allow averaging to remove some noise, and then the CORDIC algorithm is performed over the I and Q components to find the phase angle.
 
 ## Hardware
@@ -47,7 +48,14 @@ KiCAD using ASCII-based file formats for all of its files, so this wasn't too di
 There's one file, `padgen/pad_config.py`, that contains all the appropriate parameters, and it's used in all the other generation scripts to keep everything in sync.
 
 ## Build log 1
-*TODO talk about rev 1*
+The first revision included a few stages of filtering along with a trimmable gain stage followed by a low pass and a fixed gain stage.
+The input is biased up to around the middle of the op amp's dynamic range, and that resistor actually forms a high pass filter with the capacitive output of the receiving electrode.
+The resistor value had to be tweaked a fair bit to get decent performance.
+Also, the filtering in this setup wasn't particularly effective, and the output into the ADC didn't look particularly much like a sine wave; the digital filtering does a great job of cleaning it up I guess.
 
 ## Build log 2
 *TODO talk about rev 2*
+I was hoping to shrink the board during this revision, but it actually ended up noticeably bigger because of the additional analog filtering stages.
+The second revision greatly extended the filtering done, using a pair of op amps to add an active bandpass filter.
+It still seems to be affected by noise when you touch the scales, but the signal into the ADC looks much closer to a sine wave, so it might be possible to toss out some of the filtering it's doing right now to add in some to filter out this low frequency noise.
+I'm honestly probably not going to do anything aside from maybe messing with the frontend filtering since this is working very close to perfectly, as long as you don't touch it.
