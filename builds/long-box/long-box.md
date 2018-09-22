@@ -187,7 +187,7 @@ I was concerned with how much contrast I could get based on what I saw on the te
 
 ![Sanded down](engraving6.jpg)
 Extra bits sanded down.
-I'm pretty happy with the results
+It's looking pretty good
 
 ## Finished box
 ![Finished box](box0.jpg)
