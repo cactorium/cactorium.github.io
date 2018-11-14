@@ -27,8 +27,10 @@ Otherwise, setting up for programming wasn't too much more touchy than normal.
 The Launchpad seems to have trouble supplying enough power to run the entire board, even with the accelerometer and gyroscope unpopulated, so I've been using an external supply to do that.
 As usual, TI's SWD is sensitive to line line and having good connections, so I had to adjust and resolder the programming connections a few times before it started working consistently.
 
+### 11/13/2018
 Luckily TI has a good amount of documentation on the CapTiVate library stuff [here](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/CapTIvate_Design_Center/latest/exports/docs/users_guide/html/CapTIvate_Technology_Guide_html/markdown/ch_library.html#setting-up-an-application).
 I haven't found a decent way to get it to compile with plain GCC, so I've been using whatever compiler TI's Code Composer Studio comes up with.
+Most of the touch-related stuff's generated using their Design GUI thing, and so far it's been just adjusting a few of the definitions in `CAPT_UserConfig.h` and `CAPT_BSP.h`.
 
 TODO add picture of programmer connected to partially populated board
 
