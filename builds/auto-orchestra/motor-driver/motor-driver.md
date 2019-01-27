@@ -33,8 +33,11 @@ I also managed to somehow mess up the Arduino-ish board I was using to generate 
 I'm guessing some of the protection diodes somewhere must've shorted out or something.
 There was a lot of overshoot on the motor output, and that was fixed by installing the bypass capacitors that I forgot about
 
-So all this paved the way to the next revision; a smaller board with easier access to the PWM pins and fewer capacitors
+So all this paved the way to the next revision; a smaller board with easier access to the PWM pins and fewer capacitors.
 
 ## Revision 2
 
 TODO layout here
+
+Here I also fried a bunch of MOSFETs from shorting the driver outputs.
+I guess maybe some kind of overcurrent protection might make sense...
