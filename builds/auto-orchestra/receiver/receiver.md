@@ -30,7 +30,12 @@ The resistor values around here are pretty low to avoid adding too much Johnson 
 Also, basically every amplifier stage has a capacitor at its input to both mitigate the effect of offset voltage and to filter out low frequency noise and an RC filter at its output to filter out high frequency noise, plus some feedback capacitance to ensure good stability and attenuate high frequency noise even further.
 This basically meant the chain acted as a lazily designed bandpass filter.
 
-TODO talk about variable gain stages
+There's two variable gain stages, the first of which uses a JFET as a voltage-controlled resistor.
+The JFET's gate bias is controlled using an op amp, which servos the voltage it's fed into a controlled current, which then leads to a controlled voltage drop from the reference node on the op amp to the JFET's gate.
+The voltage fed into the op amp is controlled by an Attiny412, which generates a PDM signal that's fed into two stages of low pass filtering before reaching the op amp input.
+The second variable gain stage uses an analog switch to switch between two resistors, allowing either 2x or 33x gain.
+
+TODO ADC, MCU
 
 The digital circuitry was fed using a single 3.3 V LDO powered off the input +5 V rail.
 The analog circuitry was powered off of two boost converters, generating +12 V and -12 V from +5 V, which were then used to generate all the analog voltages.
@@ -42,7 +47,7 @@ To reduce noise even further, basically everything has a 33 ohm resistor slapped
 ## Results
 It works! At least up to the ADC input right now
 
-TODO fill in
+TODO fill in after everything's working
 
 ## Mistakes
 So far I've found a bunch of them!
@@ -53,7 +58,7 @@ This probably caused the most trouble.
 First off, I has the footprint for one of the converters backwards, which took a fair bit of testing and a couple sacrificial ICs to work out.
 Luckily the package was designed so that the pins almost touch the top surface of the IC, and there wasn't a ground pad, so it was pretty easy just to flip the chip over and solder it that way.
 
-The
+TODO talk about switching reg noise
 
 ### Transimpedance amplifier
 Not much actually failed here.
@@ -63,6 +68,26 @@ Soo that's a lot of design work down the drain, I guess that's what I get for do
 ### Amplifiers
 Not much broke in these stages, although there was some noise I haven't tracked down yet on the output of the first variable gain stage.
 The control circuitry works, but I'm not entirely sure theory wise why it works.
-As mentioned before, 
+As I mentioned before, it's got two stages of RC filters into the op amp, which uses a BJT with a current sensing resistor to control the current passing into another resistor, which sets the voltage bias on the JFET's gate.
+The voltage across the current sensing resistor is fed back to both the op amp for feedback as well as into a Attiny412, also as feedback.
+The Attiny uses its free running ADC to sample the voltage at around 48 kHz, runs a PI controller and outputs a PDM signal, which is fed into the RC filters into the amplifier input.
+I figured that, since the cascaded RC filters would lead to high phase shift to close to 180 degrees at higher frequencies, it'd make sense to have a dominant integrating term to simultaneously null out the effect of op amp input offset and compensate for some of the input phase lag.
+I simulated this and it seems to work correctly, but when I tested it in real life it ended up with some strong oscillations in the ~40 Hz range.
+I added a lot of dampening (~500x) in the form of the proportional term, and that seems to have stabilized it, although multimeter measurements seem to indicate that there's still some weird stuff going on.
 
-TODO talk about JFET gate oscillations
+Also, I could've designed the switching for the second gain stage better.
+As of right now, switching between the two leads to a temporary break in the feedback loop, which probably leads to some short lived transients in the output signal.
+More importantly, the clamping circuitry after it is not well designed at all.
+It should really be a bunch of diodes hooked up in parallel with the feedback loop, which wouldn't lead to the op amp overdriving.
+
+I didn't look very closely at the original op amp that set the JFET bias, so the common mode input range of the one I chose didn't actually go down to ground.
+This meant that I couldn't reduce the bias of the JFET down to zero, it got stuck at around 0.9 V.
+Luckily this was in a common package so it was just a matter of swapping out the part for a pin compatible one.
+There were a lot of cheap op amps that had the right CMR, but lacked the ability to drive the output close enough to the rails for what I needed, which I could have accounted for at the beginning if I'd known about it by moving the positive voltage rail up to 15 V.
+The issue is that this was a quad op amp package, and one of the op amps was used to regulate the 10 V rail.
+Most op amps seem to be spec'd to work up to Vcc-2 V, which means they wouldn't be able to drive the voltage high enough to get 10 V at the BJT's emitter/output.
+So I ended up getting a much more expensive (almost 10x!) op amp, with okayish noise.
+
+### ADC
+
+TODO talk about how I fucked up the ADC input design
