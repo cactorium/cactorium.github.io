@@ -45,7 +45,8 @@ These both shared a ADR550 shunt precision voltage reference, using a pair of op
 To reduce noise even further, basically everything has a 33 ohm resistor slapped between their bypass capacitors and the power supply to attenuate any noise on the power rails.
 
 ## Results
-It works! At least up to the ADC input right now
+It works!
+It's generating data at ~100 kHz, although that might be scaled down if that ends up being too high for the Raspberry Pi 3 (the target platform) to process.
 
 TODO fill in after everything's working
 
@@ -58,7 +59,10 @@ This probably caused the most trouble.
 First off, I has the footprint for one of the converters backwards, which took a fair bit of testing and a couple sacrificial ICs to work out.
 Luckily the package was designed so that the pins almost touch the top surface of the IC, and there wasn't a ground pad, so it was pretty easy just to flip the chip over and solder it that way.
 
-TODO talk about switching reg noise
+There's noticeable noise in the >1 MHz range basically everywhere in the circuit, because of the switching regulators that power everything.
+Even with the RC filters, there's still measurable noise in the reference circuitry, which then gets mirrored on all the supplies and consequently into the signal circuitry.
+In fact, the RC filters don't seem to attenuate it much at all.
+It actually doesn't seem like a big deal (which is why I chose high frequency switchers in the first place) since this is well outside of the target frequency range, but it does bother me a bit.
 
 ### Transimpedance amplifier
 Not much actually failed here.
