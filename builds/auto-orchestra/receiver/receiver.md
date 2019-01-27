@@ -35,7 +35,9 @@ The JFET's gate bias is controlled using an op amp, which servos the voltage it'
 The voltage fed into the op amp is controlled by an Attiny412, which generates a PDM signal that's fed into two stages of low pass filtering before reaching the op amp input.
 The second variable gain stage uses an analog switch to switch between two resistors, allowing either 2x or 33x gain.
 
-TODO ADC, MCU
+The amplifier output is then fed into a MAX11666AUB+1 ADC, which is controlled by the STM32F070F6P6. ARM Cortex-M0 microcontroller via SPI.
+This is my first project using USB communication, which allows for a much higher bitrate than standard UART, allowing me to dump all the ADC into the Raspberry Pi 3 for processing.
+The STM32 also controls the Attiny using UART at 115200 baud.
 
 The digital circuitry was fed using a single 3.3 V LDO powered off the input +5 V rail.
 The analog circuitry was powered off of two boost converters, generating +12 V and -12 V from +5 V, which were then used to generate all the analog voltages.
