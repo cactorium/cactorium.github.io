@@ -7,7 +7,7 @@ I'm going to power the LNA using the bias tee feature of my RTL-SDR, so it'll re
 In order to separate out the power from the output signal, I'm using a capacitor and inductor to separate the high frequency signal componet from the low frequency DC component.
 This, plus plenty of bypass capacitors, should allow me to power the LNA through the output signal line.
 
-![Schematic for the design](./schematic.jpg)
+![Schematic for the design](./schematic.png)
 
 I'm using the NXP BFU520R transistor as the heart of this amplifier.
 It's being used in a pretty standard/simple common emitter configuration.
@@ -31,7 +31,7 @@ I'd need to use three different copies of this connector pair to calibrate the V
 
 ## PCB
 
-![PCB for the second revision](./pcb3d.jpg)
+![PCB for the second revision](./pcb3d.png)
 
 After wasting one revision by accidentally flipping the collector and base pins, I ended up with this layout.
 It's pretty self explanatory, nothing too special aside from the normal constraints with RF layout.
@@ -46,8 +46,11 @@ This meant that the VNA input was definitely saturated the amplifier, limiting t
 The obvious solution to this is to reduce the VNA output, which my cheap VNA obviously doesn't have.
 
 This meant I needed to add an attenuator between the VNA output and the base of the transistor I'm testing.
-This attenuator would affect the measured scattering parameters, so I looked out how to de embed that from the , and 
-it turns out it's not too terrible if the transform the values into transmission space first.
+This attenuator would affect the measured scattering parameters, so I looked out how to de embed that from the measurement, and 
+it turns out it's not too terrible if you transform the values into transmission space first.
 However, after adding the attenuator to the circuit, the de embedded measurements didn't seem correct.
 They did indicate the 20 dB gain I was expected, but they also indicated that the transistor was unstable due to |S11| > 1 for a lot of frequncies.
+Calibrating the VNA with the attenuator didn't work either.
 Now I'm hoping either a simpler attenuator setup, or a better VNA, would give me better results.
+
+![VNA with first attenuator setup](./vnawithuflterminator.jpg)
