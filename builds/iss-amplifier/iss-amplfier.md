@@ -39,3 +39,15 @@ I did make my own taper for the SMA connection footprints, using Kicad 5's new c
 I think they look pretty nice though.
 
 ## Measurements
+My intial tests showed the amplifier producing a paltry 10 dB of gain, way less than the expected 20 dB.
+It took me a day of testing to realize that this was because of the VNA instead of my circuit design.
+The VNA's output is around -6 dBm, while the amplfier (according to the datasheet) has a 1 dB compression point at around +1 dBm.
+This meant that the VNA input was definitely saturated the amplifier, limiting the amount of power that could be output, andconsequently degrading the gain measured by the VNA.
+The obvious solution to this is to reduce the VNA output, which my cheap VNA obviously doesn't have.
+
+This meant I needed to add an attenuator between the VNA output and the base of the transistor I'm testing.
+This attenuator would affect the measured scattering parameters, so I looked out how to de embed that from the , and 
+it turns out it's not too terrible if the transform the values into transmission space first.
+However, after adding the attenuator to the circuit, the de embedded measurements didn't seem correct.
+They did indicate the 20 dB gain I was expected, but they also indicated that the transistor was unstable due to |S11| > 1 for a lot of frequncies.
+Now I'm hoping either a simpler attenuator setup, or a better VNA, would give me better results.
