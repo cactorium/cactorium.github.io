@@ -59,6 +59,12 @@ I ended up disassembling the VNA to see if I could attenuate the signal somewher
 Reducing the signal there is much better than attenuating outside the VNA,
 because when you attenuate the signal before the reflection is measured, you reduce the reflection only by the amount you attenuate the signal,
 whereas attenuating externally attenuates the signal as it's coming in along with when it's reflected.
+For example, if I stuck a 10 dB attenuator internally before the directional coupler,
+the output tone would be attenuated by 10 dB, and the reflected signal would be 10 dB weaker because the device under test (DUT) would see a signal 10 dB weaker than the old reference signal.
+However, if I used a 10 dB external attenuator, this would attenuate the VNA's output signal by 10 dB, sending a signal 10 dB weaker to the DUT,
+and which would reflect a 10 dB weaker back to the attenuator, which would then attenuate that reflection to 10 dB before transmitting it back to the VNA, giving a total of -20 dB attenuation on the reflection.
+This meant that my previous setup was attenuating reflections by ~40 dB, which would explain why the measurements looked barely separable for noise
+
 I found some schematics for the VNA and found an attenuator in the Tx signal path.
 It was a nice 0805 chip attenuator, so I bought a -10 dB attenuator of the same size and swapped it out.
 I took some measurements on the existing attenuator to try to figure out that value it was.
