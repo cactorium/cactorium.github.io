@@ -43,14 +43,49 @@ My intial tests showed the amplifier producing a paltry 10 dB of gain, way less 
 It took me a day of testing to realize that this was because of the VNA instead of my circuit design.
 The VNA's output is around -6 dBm, while the amplfier (according to the datasheet) has a 1 dB compression point at around +1 dBm.
 This meant that the VNA input was definitely saturated the amplifier, limiting the amount of power that could be output, andconsequently degrading the gain measured by the VNA.
-The obvious solution to this is to reduce the VNA output, which my cheap VNA obviously doesn't have.
+The obvious solution to this is to reduce the VNA output, which my cheap VNA obviously doesn't allow.
 
 This meant I needed to add an attenuator between the VNA output and the base of the transistor I'm testing.
 This attenuator would affect the measured scattering parameters, so I looked out how to de embed that from the measurement, and 
 it turns out it's not too terrible if you transform the values into transmission space first.
 However, after adding the attenuator to the circuit, the de embedded measurements didn't seem correct.
-They did indicate the 20 dB gain I was expected, but they also indicated that the transistor was unstable due to |S11| > 1 for a lot of frequncies.
+They did indicate the 20 dB gain I was expecting, but they also indicated that the transistor was unstable due to |S11| > 1 for a lot of frequncies.
 Calibrating the VNA with the attenuator didn't work either.
 Now I'm hoping either a simpler attenuator setup, or a better VNA, would give me better results.
 
 ![VNA with first attenuator setup](./vnawithuflterminator.jpg)
+
+I ended up disassembling the VNA to see if I could attenuate the signal somewhere internally.
+Reducing the signal there is much better than attenuating outside the VNA,
+because when you attenuate the signal before the reflection is measured, you reduce the reflection only by the amount you attenuate the signal,
+whereas attenuating externally attenuates the signal as it's coming in along with when it's reflected.
+I found some schematics for the VNA and found an attenuator in the Tx signal path.
+It was a nice 0805 chip attenuator, so I bought a -10 dB attenuator of the same size and swapped it out.
+I took some measurements on the existing attenuator to try to figure out that value it was.
+It definitely was less than -10 dB, so replacing it should reduce the signal strength by some useful amount.
+
+![VNA internals](./vnapcb.jpg)
+
+![Replacing a 20 cent part on a $300 board](./vna_rework.jpg)
+
+This seems to have done the trick.
+Adding a 10 dB attenuator after the VNA output gives reasonable looking measurements.
+The measurements still seem fairly accurate without the 10 dB attenuator, aside from S21 which is obviously compressing.
+
+![Smith chart for the unmatched BFU520 circuit](./smith_unmatched.png)
+
+Doing a conjugate match with these parameters leads to a matching network of 100 nH in series and then shunted with a 2.65 pF capacitor on the soruce,
+and a 4.8 pF capacitor shunt followed by a series 60 nH inductor.
+This didn't quite work when assembled so I adjusted the source inductor and capacitor to 120 nH and 3.0 pF to get it to match better.
+The calculations used here are detailed in the Python notebook in the git repo for the project
+
+![Final measurement setup with matching components in place](./matching_measurement.jpg)
+
+Here are the final measurements:
+
+![Final Smith chart measurements](./smith_matched.png)
+![S11, S22 db plot](./db_matched_s11_s22.png)
+![S21 db plot](./db_matched_s21.png)
+
+They correlate nicely with the predicted results, and give about 20 dB gain in the range I care about.
+I still need to figure out how to do NF measurements to figure out what kind of NF I'm looking at, but that should be relatively easy.
