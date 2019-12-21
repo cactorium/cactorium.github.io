@@ -3,6 +3,7 @@
 - [engraved box](./builds/long-box/long-box.md)
 - [solder inspection microscope](./builds/microscope/microscope.md)
 - [144 MHz amplifier (for amateur radio stuff)](./builds/iss-amplifier/iss-amplifier.md)
+- [915 MHz ISM transceiver](./builds/ism-transceiver/transceiver.md)
 - TODO Bluetooth telegraph
 - TODO Chesster
 - TODO autoquartet
