@@ -1,4 +1,4 @@
-# Setting up Linux on an HP Pavilion 15
+# Setting up Linux on an HP Pavilion 15z
 This laptop needed a few tweaks to get it working.
 I'm running Manjaro with Linux 5.5.0 as of right now
 
