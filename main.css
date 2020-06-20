@@ -1,0 +1,92 @@
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(240, 240, 240);
+  position: relative;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+article {
+  max-width: 1012px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-bottom: 4em;
+}
+
+nav {
+  background-color: rgb(32, 32, 32);
+  margin-right: auto;
+  margin-left: auto;
+  color: rgb(180, 220, 180);
+}
+
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 2.5rem;
+}
+
+a {
+  text-decoration: none;
+}
+
+nav a {
+  color: rgb(220, 220, 250);
+}
+
+
+.footer-wrapper, .nav-wrapper {
+  max-width: 1012px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.nav-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex;
+  flex-wrap: wrap;
+}
+
+.nav-item {
+  transition: 0.3s;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.nav-item a {
+  padding-left: 2.0em;
+  padding-right: 2.0em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  transition: 0.3s;
+}
+
+.nav-item:hover {
+  background-color: rgb(180, 220, 200);
+  transition: 0.3s;
+}
+
+.nav-item:hover a {
+  transition: 0.3s;
+  color: rgb(5, 35, 35);
+}
+
+.footer-wrapper {
+  text-align: right;
+  padding-top: 1.0em;
+  padding-bottom: 1em;
+  padding-left: 1.0em;
+  padding-right: 1.0em;
+  /*bottom: 0;*/
+}
