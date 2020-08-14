@@ -1,0 +1,114 @@
+<!doctype html5>
+<html>
+  <head>
+    <title>Chess</title>
+<style>
+.invisible {
+  display: none;
+}
+
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.mainstuff {
+}
+
+.sidebar {
+  padding: 0.25em;
+}
+
+table#chessboard {
+}
+
+table#chessboard tr td {
+  width: 1.5em;
+  height: 1.5em;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 32px;
+  border-radius: 10%;
+}
+
+table#chessboard tr {
+  padding: 0;
+  margin: 0;
+}
+
+table#chessboard tr:nth-child(even) td:nth-child(odd),
+    table#chessboard tr:nth-child(odd) td:nth-child(even) {
+  background-color: #999;
+}
+
+table#chessboard tr:nth-child(even) td:nth-child(even),
+    table#chessboard tr:nth-child(odd) td:nth-child(odd) {
+  background-color: #fff;
+}
+
+table#chessboard tr:nth-child(even) td:nth-child(odd).selected,
+    table#chessboard tr:nth-child(odd) td:nth-child(even).selected {
+  background-color: #555;
+}
+
+table#chessboard tr:nth-child(even) td:nth-child(even).selected,
+    table#chessboard tr:nth-child(odd) td:nth-child(odd).selected {
+  background-color: #bbb;
+}
+
+
+
+</style>
+<script src="chess.js" type="text/javascript"></script>
+<script type="text/javascript">
+window.onload = init
+</script>
+  </head>
+  <body>
+    <noscript>yo you need javascript to play chess</noscript>
+    <div class="wrapper">
+      <div class="mainstuff">
+      <table id="chessboard">
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="sidebar">
+        <div>
+        <p>you are playing as <span id="playing_as"></span></p>
+        <p>current move: <span id="current_move"></span></p>
+        <p>selected move: <span id="selected_div"></span></p>
+        <form>
+          <input type="button" id="newgame" value="new game"></input>
+          <input type="button" id="cancel" value="cancel move" disabled></input>
+          <input type="button" id="confirm" value="confirm move" disabled></input>
+          <p>short link: <span id="selected_piece"></span></p>
+          <p>long link: <span id="selected_piece"></span></p>
+        </form>
+        <p>move list: <span id="movelist"></span></p>
+        </div>
+        <div id="promotion" class="invisible">
+          select your promotion:
+          <form>
+            <input type="button" id="pick_queen" value="queen"></input>
+            <input type="button" id="pick_bishop" value="bishop"></input>
+            <input type="button" id="pick_knight" value="knight"></input>
+            <input type="button" id="pick_rook" value="rook"></input>
+            <input type="button" id="cancel_promotion" value="Cancel"></input>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
