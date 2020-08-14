@@ -1173,7 +1173,7 @@ function confirm_move() {
   localStorage.setItem("game", encode_game(cur_game, playing_side))
 
   // pop up a link or whatever
-  document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.host + window.location.pathname + "#" + link_hash
+  document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
   document.getElementById("link").focus()
   document.getElementById("link").select()
   document.execCommand("copy")
@@ -1318,7 +1318,7 @@ function init() {
 
   if (playing_side != active_side(cur_game)) {
     const link_hash = encode_last_move(cur_game)
-    document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.host + window.location.pathname + "#" + link_hash
+    document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
     document.getElementById("link").focus()
     document.getElementById("link").select()
     send_toast("send the link to your friend so they can play")
