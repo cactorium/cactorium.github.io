@@ -765,27 +765,9 @@ function getMoveNotation(state, move) {
   return ret
 }
 
-// ui logic starts here
+// encoding logic starts here
 
-var single_player = false
-
-var playing_side = White
-var cur_game = new Game()
-var past_game = null
-var move_history = []
-
-var selected_j = -1, selected_i = -1
-var valid_moves = null
-
-var selected_move = null
-var promotion_selected = false
-var next_move = null
-
-var movelist = ""
-
-// fix ui so that the board is rotated around when you're playing black
-
-function encode_move(state, move) {
+function get_move_idx(state, move) {
   const moves = state.calc_all_moves()
   // find the move in the list of all possible moves,
   // that index is the move data
@@ -810,7 +792,21 @@ function encode_move(state, move) {
       break
     }
   }
+  return idx
+}
 
+function get_move_from_idx(state, idx) {
+  const moves = state.calc_all_moves()
+
+  if (idx < moves.length) {
+    return moves[idx]
+  } else {
+    return null
+  }
+}
+
+function encode_move(state, move) {
+  const idx = get_move_idx(state, move)
   if (idx == -1) {
     console.log("W: found move not in move list")
     return "FUCKTHISSHOULDNTHAPPEN"
@@ -826,17 +822,96 @@ function encode_move(state, move) {
 }
 
 function decode_move(state, msg) {
-  const moves = state.calc_all_moves()
-
   var msg_str = atob(msg)
   var decoded_idx = (msg_str.charCodeAt(1) << 8) | msg_str.charCodeAt(0)
-  var decoded_move = msg_str.charCodeAt(2)
-  if (decoded_move < moves.length) {
-    return moves[decoded_move]
-  } else {
+
+  if (decoded_idx != state.moves.length) {
     return null
   }
+  var decoded_move = msg_str.charCodeAt(2)
+  return get_move_from_idx(state, decoded_move)
 }
+
+function encode_game(state, playing_as) {
+  // first byte contains whether you're playing as white or black
+  // second two bytes contain the number of moves played so far
+  // the rest are move indices
+  var msg_buf = new Uint8Array(3 + state.moves.length)
+  if (playing_as == White) {
+    msg_buf[0] = 0
+  } else {
+    msg_buf[0] = 1
+  }
+  var move_len = state.moves.length
+  msg_buf[1] = state.moves.length & 0xff
+  msg_buf[2] = (state.moves.length >> 8) & 0xff
+
+  var tmp = new Game()
+  for (var i = 0; i < state.moves.length; i++) {
+    msg_buf[3 + i] = get_move_idx(tmp, state.moves[i])
+    make_move_unchecked(tmp, state.moves[i])
+  }
+  var msg_str = String.fromCharCode(...msg_buf)
+  return btoa(msg_str)
+}
+
+function get_move_formatted(state, move) {
+  var ret = ""
+  if (active_side(state) == White) {
+    ret += (state.moves.length/2 + 1).toString() + "."
+  }
+  ret += " "
+  ret += getMoveNotation(state, move)
+  ret += " "
+  return ret
+}
+
+function decode_game(msg) {
+  var msg_str = atob(msg)
+  var ml = ""
+  const playing_as = ((msg_str.charCodeAt(0) & 0x1) == 0) ? White : Black
+  const move_len = (msg_str.charCodeAt(2) << 8) | msg_str.charCodeAt(1)
+
+  if ((move_len + 3) > msg_str.length) {
+    console.log("invalid game found! invalid move length")
+    return null
+  }
+  var tmp = new Game()
+  for (var i = 0; i < move_len; i++) {
+    const m = get_move_from_idx(tmp, msg_str.charCodeAt(i + 3))
+    ml += get_move_formatted(tmp, m)
+    make_move_unchecked(tmp, m)
+  }
+  return [tmp, playing_as, ml]
+}
+
+function encode_last_move(state) {
+  if (state.moves.length == 0) {
+    return ""
+  }
+  var tmp = new Game()
+  for (var i = 0; i < state.moves.length - 1; i++) {
+    make_move_unchecked(tmp, state.moves[i])
+  }
+  return encode_move(tmp, state.moves[state.moves.length - 1])
+}
+
+// ui logic starts here
+
+var single_player = false
+
+var playing_side = White
+var cur_game = new Game()
+var past_game = null
+
+var selected_j = -1, selected_i = -1
+var valid_moves = null
+
+var selected_move = null
+var promotion_selected = false
+var next_move = null
+
+var movelist = ""
 
 function reset_ui() {
   selected_j = -1
@@ -1025,9 +1100,9 @@ function try_select(j, i) {
 }
 
 function onclickhandler(j, i) {
-  const tj = t(j)
-  const ti = t(i)
   return function() {
+    const tj = t(j)
+    const ti = t(i)
     if ((past_game == null) && (single_player || (active_side(cur_game) == playing_side))) {
       if (next_move == null) {
         if (!selected()) {
@@ -1062,12 +1137,17 @@ function onclickhandler(j, i) {
 }
 
 function add_to_movelist(state, move) {
-  if (active_side(state) == White) {
-    movelist += (state.moves.length/2 + 1).toString() + "."
-  }
-  movelist += " "
-  movelist += getMoveNotation(state, move)
-  movelist += " "
+  movelist += get_move_formatted(state, move)
+}
+
+function send_toast(msg) {
+  const snackbar = document.getElementById("snackbar")
+  snackbar.textContent = msg
+  snackbar.classList.add("show")
+
+  setTimeout(function(){
+    snackbar.classList.remove("show")
+  }, 3000);
 }
 
 function confirm_move() {
@@ -1075,6 +1155,7 @@ function confirm_move() {
     return
   }
 
+  var link_hash = encode_move(cur_game, selected_move)
   add_to_movelist(cur_game, selected_move)
   cur_game = next_move
 
@@ -1086,10 +1167,18 @@ function confirm_move() {
   promotion_selected = false
   next_move = null
 
-
   update_ui()
 
-  // TODO pop up a link or whatever
+  // save to localstorage
+  localStorage.setItem("game", encode_game(cur_game, playing_side))
+
+  // pop up a link or whatever
+  document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.host + window.location.pathname + "#" + link_hash
+  document.getElementById("link").focus()
+  document.getElementById("link").select()
+  document.execCommand("copy")
+
+  send_toast("send the link to your friend so they can play")
 }
 
 function cancel_move() {
@@ -1161,6 +1250,20 @@ function forward_all() {
   update_ui()
 }
 
+function new_game() {
+  if (confirm("Are you sure you want to start a new game? This will delete any game you have in progress")) {
+    localStorage.clear()
+    playing_side = White
+
+    past_game = null
+    movelist = ""
+
+    cur_game = new Game()
+    reset_ui()
+    update_ui()
+  }
+}
+
 function init() {
   const table = document.getElementById("chessboard")
   const rows = table.children[0].children
@@ -1186,9 +1289,40 @@ function init() {
 
   document.getElementById("newgame").addEventListener("click", new_game)
 
-  // TODO try to load a game from LocalStorage
-  // TODO if there is a message in the URI try to load it as a move
-  // special case move one; switch to black if a move 1 move is detected
-  // and there isn't a game in progress
+  // try to load a game from LocalStorage
+  const maybe_game = localStorage.getItem("game")
+  if (maybe_game != null) {
+    console.log("found game! loading from local storage")
+    const decoded_game = decode_game(maybe_game)
+    if (decoded_game != null) {
+      const [game, playing_as, ml] = decoded_game
+
+      cur_game = game
+      movelist = ml
+      playing_side = playing_as
+    }
+  }
+
+  // if there is a message in the URI try to load it as a move
+  // play as the currently active player
+  if (window.location.hash.length > 1) {
+    console.log("found hash, trying to decode")
+    const maybe_move = decode_move(cur_game, window.location.hash.slice(1))
+    if (maybe_move != null) {
+      console.log("decoded successfully")
+      add_to_movelist(cur_game, maybe_move)
+      make_move_unchecked(cur_game, maybe_move)
+      playing_side = active_side(cur_game)
+    }
+  }
+
+  if (playing_side != active_side(cur_game)) {
+    const link_hash = encode_last_move(cur_game)
+    document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.host + window.location.pathname + "#" + link_hash
+    document.getElementById("link").focus()
+    document.getElementById("link").select()
+    send_toast("send the link to your friend so they can play")
+  }
+
   update_ui()
 }
