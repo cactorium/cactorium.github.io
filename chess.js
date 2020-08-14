@@ -767,8 +767,12 @@ function getMoveNotation(state, move) {
 
 // ui logic starts here
 
+var single_player = false
+
 var playing_side = White
 var cur_game = new Game()
+var past_game = null
+var move_history = []
 
 var selected_j = -1, selected_i = -1
 var valid_moves = null
@@ -779,7 +783,70 @@ var next_move = null
 
 var movelist = ""
 
-// TODO fix ui so that the board is rotated around when you're playing black
+// fix ui so that the board is rotated around when you're playing black
+
+function encode_move(state, move) {
+  const moves = state.calc_all_moves()
+  // find the move in the list of all possible moves,
+  // that index is the move data
+  // prepend with a 16-bit move count, and that's converted into base64
+  var idx = -1
+  for (var i = 0; i < moves.length; i++) {
+    if (move.en_passant) {
+      if (!moves[i].en_passant) {
+        continue
+      }
+    }
+    if (move.promotion) {
+      if (!moves[i].promotion || moves[i].promotion != move.promotion) {
+        continue
+      }
+    }
+    if ((move.src.col == moves[i].src.col) && 
+        (move.src.row == moves[i].src.row) &&
+        (move.dst.col == moves[i].dst.col) &&
+        (move.dst.row == moves[i].dst.row)) {
+      idx = i
+      break
+    }
+  }
+
+  if (idx == -1) {
+    console.log("W: found move not in move list")
+    return "FUCKTHISSHOULDNTHAPPEN"
+  }
+
+  var msg = new Uint8Array(3)
+  msg[0] = state.moves.length & 0xff
+  msg[1] = (state.moves.length >> 8) & 0xff
+  msg[2] = idx
+
+  var msg_str = String.fromCharCode(...msg)
+  return btoa(msg_str)
+}
+
+function decode_move(state, msg) {
+  const moves = state.calc_all_moves()
+
+  var msg_str = atob(msg)
+  var decoded_idx = (msg_str.charCodeAt(1) << 8) | msg_str.charCodeAt(0)
+  var decoded_move = msg_str.charCodeAt(2)
+  if (decoded_move < moves.length) {
+    return moves[decoded_move]
+  } else {
+    return null
+  }
+}
+
+function reset_ui() {
+  selected_j = -1
+  selected_i = -1
+  valid_moves = null
+
+  selected_move = null
+  promotion_selected = false
+  next_move = null
+}
 
 function selected() {
   return !out_of_bounds(selected_j, selected_i)
@@ -793,26 +860,40 @@ function update_ui() {
   const table = document.getElementById("chessboard")
   const rows = table.children[0].children
 
-  if (next_move == null) {
+  if (past_game != null) {
+    past_game.render(playing_side)
+  } else if (next_move == null) {
     cur_game.render(playing_side)
   } else {
     next_move.render(playing_side)
   }
 
-  if (selected()) {
-    if (selected_move == null) {
-      for (var j = 0; j < 8; j++) {
-        for (var i = 0; i < 8; i++) {
-          rows[j].children[i].classList.remove("selected")
+  // act normally if we're not peeking at the past
+  if (past_game == null) {
+    if (selected()) {
+      if (selected_move == null) {
+        for (var j = 0; j < 8; j++) {
+          for (var i = 0; i < 8; i++) {
+            rows[j].children[i].classList.remove("selected")
+          }
         }
-      }
 
-      if (valid_moves == null) {
-        console.log("W: valid_moves was null while a piece was selected")
-      } else {
-        for (var m of valid_moves) {
-          rows[t(m.dst.row)].children[t(m.dst.col)].classList.add("selected")
+        if (valid_moves == null) {
+          console.log("W: valid_moves was null while a piece was selected")
+        } else {
+          for (var m of valid_moves) {
+            rows[t(m.dst.row)].children[t(m.dst.col)].classList.add("selected")
+          }
         }
+      } else {
+        for (var j = 0; j < 8; j++) {
+          for (var i = 0; i < 8; i++) {
+            rows[j].children[i].classList.remove("selected")
+          }
+        }
+
+        rows[t(selected_move.src.row)].children[t(selected_move.src.col)].classList.add("selected")
+        rows[t(selected_move.dst.row)].children[t(selected_move.dst.col)].classList.add("selected")
       }
     } else {
       for (var j = 0; j < 8; j++) {
@@ -820,61 +901,90 @@ function update_ui() {
           rows[j].children[i].classList.remove("selected")
         }
       }
+    }
 
-      rows[t(selected_move.src.row)].children[t(selected_move.src.col)].classList.add("selected")
-      rows[t(selected_move.dst.row)].children[t(selected_move.dst.col)].classList.add("selected")
+    if (selected_move != null && (!selected_move.promotion || promotion_selected)) {
+      document.getElementById("confirm").disabled = false
+      document.getElementById("cancel").disabled = false
+    } else {
+      document.getElementById("confirm").disabled = true
+      document.getElementById("cancel").disabled  = true
+    }
+
+    // update the state of the promotion menu
+    if (selected_move != null && selected_move.promotion && !promotion_selected) {
+      document.getElementById("promotion").classList.remove("invisible")
+    } else {
+      document.getElementById("promotion").classList.add("invisible")
+    }
+
+    // update the current move and selected move entries
+    document.getElementById("current_move").textContent = (active_side(cur_game) == White) ? "white" : "black"
+
+    const selected_div = document.getElementById("selected_div")
+    if (selected_move != null) {
+      if (active_side(cur_game) == White) {
+        selected_div.textContent = ""
+      } else {
+        selected_div.textContent = "..."
+      }
+      selected_div.textContent += getMoveNotation(cur_game, selected_move)
+    } else if (!out_of_bounds(selected_j, selected_i)) {
+      switch (cur_game.board[selected_j][selected_i].typ) {
+        case Pawn: selected_div.textContent = "pawn"
+          break
+        case Rook: selected_div.textContent = "rook"
+          break
+        case Knight: selected_div.textContent = "knight"
+          break
+        case Queen: selected_div.textContent = "queen"
+          break
+        case King: selected_div.textContent = "king"
+          break
+        case Empty: selected_div.textContent = "-"
+          break
+      }
+    } else {
+      selected_div.textContent = ""
     }
   } else {
+    // if we're in history mode,
+    // basically just select the last move that was made 
     for (var j = 0; j < 8; j++) {
       for (var i = 0; i < 8; i++) {
         rows[j].children[i].classList.remove("selected")
       }
     }
-  }
 
-  if (selected_move != null && (!selected_move.promotion || promotion_selected)) {
-    document.getElementById("confirm").disabled = false
-    document.getElementById("cancel").disabled = false
-  } else {
+    if (past_game.moves.length > 0) {
+      last_move = past_game.moves[past_game.moves.length - 1]
+      rows[t(last_move.src.row)].children[t(last_move.src.col)].classList.add("selected")
+      rows[t(last_move.dst.row)].children[t(last_move.dst.col)].classList.add("selected")
+    }
+
+    // also update current move
+    document.getElementById("current_move").textContent = (active_side(cur_game) == White) ? "white" : "black"
+
     document.getElementById("confirm").disabled = true
     document.getElementById("cancel").disabled  = true
   }
 
-  // update the state of the promotion menu
-  if (selected_move != null && selected_move.promotion && !promotion_selected) {
-    document.getElementById("promotion").classList.remove("invisible")
+  // update history button states
+  if (past_game == null) {
+    document.getElementById("peek_forward").disabled = true
+    document.getElementById("back_to_the_future").disabled = true
   } else {
-    document.getElementById("promotion").classList.add("invisible")
+    document.getElementById("peek_forward").disabled = false
+    document.getElementById("back_to_the_future").disabled = false
   }
 
-  // update the current move and selected move entries
-  document.getElementById("current_move").textContent = (active_side(cur_game) == White) ? "white" : "black"
-
-  const selected_div = document.getElementById("selected_div")
-  if (selected_move != null) {
-    if (active_side(cur_game) == White) {
-      selected_div.textContent = ""
-    } else {
-      selected_div.textContent = "..."
-    }
-    selected_div.textContent += getMoveNotation(cur_game, selected_move)
-  } else if (!out_of_bounds(selected_j, selected_i)) {
-    switch (cur_game.board[selected_j][selected_i].typ) {
-      case Pawn: selected_div.textContent = "pawn"
-        break
-      case Rook: selected_div.textContent = "rook"
-        break
-      case Knight: selected_div.textContent = "knight"
-        break
-      case Queen: selected_div.textContent = "queen"
-        break
-      case King: selected_div.textContent = "king"
-        break
-      case Empty: selected_div.textContent = "-"
-        break
-    }
+  if (((past_game != null) && (past_game.moves.length > 0)) ||
+      (cur_game.moves.length > 0)) {
+    document.getElementById("time_travel").disabled = false
+    document.getElementById("peek_back").disabled = false
   } else {
-    selected_div.textContent = ""
+    document.getElementById("time_travel").disabled = true
+    document.getElementById("peek_back").disabled = true
   }
 
   document.getElementById("playing_as").textContent = (playing_side == White) ? "white" : "black"
@@ -907,14 +1017,10 @@ function try_select(j, i) {
     valid_moves = cur_game.calc_moves(j, i)
 
     if (valid_moves.length == 0) {
-      selected_j = -1
-      selected_i = -1
-      valid_moves = null
+      reset_ui()
     }
   } else {
-    selected_j = -1
-    selected_i = -1
-    valid_moves = null
+    reset_ui()
   }
 }
 
@@ -922,39 +1028,45 @@ function onclickhandler(j, i) {
   const tj = t(j)
   const ti = t(i)
   return function() {
-    if (next_move == null) {
-      if (!selected()) {
-        try_select(tj, ti)
-      } else {
-        // see if a valid move was selected
-        var wasmove = false
-        for (var m of valid_moves) {
-          if ((m.dst.row == tj) && (m.dst.col == ti)) {
-            wasmove = true
-            selected_move = m
-            promotion_selected = false
-            next_move = cur_game.copy()
-            next_move.make_move_if_valid(m)
-            break
+    if ((past_game == null) && (single_player || (active_side(cur_game) == playing_side))) {
+      if (next_move == null) {
+        if (!selected()) {
+          try_select(tj, ti)
+        } else {
+          // see if a valid move was selected
+          var wasmove = false
+          for (var m of valid_moves) {
+            if ((m.dst.row == tj) && (m.dst.col == ti)) {
+              wasmove = true
+              selected_move = m
+              promotion_selected = false
+              next_move = cur_game.copy()
+              next_move.make_move_if_valid(m)
+              break
+            }
+          }
+
+          // unselect the piece if the square that was clicked wasn't valid
+          if (!wasmove) {
+            try_select(tj, ti)
           }
         }
-
-        // unselect the piece if the square that was clicked wasn't valid
-        if (!wasmove) {
-          try_select(tj, ti)
-        }
       }
+      update_ui()
     }
-    update_ui()
+
+    if (!single_player && (active_side(cur_game) != playing_side)) {
+      alert("it's not your move!")
+    }
   }
 }
 
-function add_to_movelist(move) {
-  if (active_side(cur_game) == White) {
-    movelist += (cur_game.moves.length/2 + 1).toString() + "."
+function add_to_movelist(state, move) {
+  if (active_side(state) == White) {
+    movelist += (state.moves.length/2 + 1).toString() + "."
   }
   movelist += " "
-  movelist += getMoveNotation(cur_game, move)
+  movelist += getMoveNotation(state, move)
   movelist += " "
 }
 
@@ -963,7 +1075,7 @@ function confirm_move() {
     return
   }
 
-  add_to_movelist(selected_move)
+  add_to_movelist(cur_game, selected_move)
   cur_game = next_move
 
   selected_j = -1
@@ -984,14 +1096,68 @@ function cancel_move() {
   if (selected_move == null) {
     return
   }
-  selected_j = -1
-  selected_i = -1
-  valid_moves = null
+  reset_ui()
 
-  selected_move = null
-  promotion_selected = false
-  next_move = null
+  update_ui()
+}
 
+function back_one() {
+  reset_ui()
+
+  if (past_game == null) {
+    past_game = cur_game.copy()
+  }
+
+  // lmao, gonna have to start from scratch and repeat all the moves
+  new_past_game = new Game()
+  movelist = ""
+
+  for (var i = 0; i < past_game.moves.length - 1; i++) {
+    add_to_movelist(new_past_game, past_game.moves[i])
+    make_move_unchecked(new_past_game, past_game.moves[i])
+  }
+
+  past_game = new_past_game
+  update_ui()
+}
+
+function back_all() {
+  reset_ui()
+
+  past_game = new Game()
+  movelist = ""
+
+  update_ui()
+}
+
+function forward_one() {
+  reset_ui()
+
+  // replay one move from cur_game
+  // if we're already at the latest, go switch back to normal mode
+  if (past_game.moves.length >= cur_game.moves.length) {
+    console.log("W: we need more power")
+    past_game = null
+    update_ui()
+    return
+  }
+  const move_idx = past_game.moves.length
+  add_to_movelist(past_game, cur_game.moves[move_idx])
+  make_move_unchecked(past_game, cur_game.moves[move_idx])
+  update_ui()
+}
+
+function forward_all() {
+  reset_ui()
+
+  // replay all the moves to get the move list back up to date
+  for (var i = past_game.moves.length; i < cur_game.moves.length; i++) {
+    add_to_movelist(past_game, cur_game.moves[i])
+    make_move_unchecked(past_game, cur_game.moves[i])
+  }
+
+  // remove past_game to return to normal mode
+  past_game = null
   update_ui()
 }
 
@@ -1013,5 +1179,16 @@ function init() {
   document.getElementById("pick_rook").addEventListener("click", promotion_handler(Rook))
   document.getElementById("cancel_promotion").addEventListener("click", cancel_move)
 
+  document.getElementById("time_travel").addEventListener("click", back_all)
+  document.getElementById("peek_back").addEventListener("click", back_one)
+  document.getElementById("peek_forward").addEventListener("click", forward_one)
+  document.getElementById("back_to_the_future").addEventListener("click", forward_all)
+
+  document.getElementById("newgame").addEventListener("click", new_game)
+
+  // TODO try to load a game from LocalStorage
+  // TODO if there is a message in the URI try to load it as a move
+  // special case move one; switch to black if a move 1 move is detected
+  // and there isn't a game in progress
   update_ui()
 }

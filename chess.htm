@@ -1,4 +1,5 @@
 <!doctype html5>
+<meta charset="utf-8">
 <html>
   <head>
     <title>Chess</title>
@@ -92,10 +93,16 @@ window.onload = init
           <input type="button" id="newgame" value="new game"></input>
           <input type="button" id="cancel" value="cancel move" disabled></input>
           <input type="button" id="confirm" value="confirm move" disabled></input>
-          <p>short link: <span id="selected_piece"></span></p>
-          <p>long link: <span id="selected_piece"></span></p>
+          <br />
+          <p>short link: <input type="text" id="short_lonk"></span></p>
+          <p>long link: <span type="text" id="long_lonk"></span></p>
+          <!-- TODO add a single/local player checkbox -->
         </form>
         <p>move list: <span id="movelist"></span></p>
+        <input type="button" id="time_travel" value="<<" disabled></input>
+        <input type="button" id="peek_back" value="<" disabled></input>
+        <input type="button" id="peek_forward" value=">" disabled></input>
+        <input type="button" id="back_to_the_future" value=">>" disabled></input>
         </div>
         <div id="promotion" class="invisible">
           select your promotion:
