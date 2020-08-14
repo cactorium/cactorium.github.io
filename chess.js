@@ -1336,6 +1336,9 @@ function init() {
     single_player = document.getElementById("singleplayer").checked
     localStorage.setItem("single_player", single_player ? "yes" : "no")
   })
+  if (single_player) {
+    document.getElementById("singleplayer").checked = true
+  }
 
   update_ui()
 }
