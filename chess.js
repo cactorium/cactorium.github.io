@@ -1332,6 +1332,10 @@ function init() {
     send_toast("send the link to your friend so they can play")
   }
 
+  document.getElementById("link").addEventListener("click", function() {
+    document.getElementById("link").select()
+  })
+
   document.getElementById("singleplayer").addEventListener("change", function() {
     single_player = document.getElementById("singleplayer").checked
     localStorage.setItem("single_player", single_player ? "yes" : "no")
