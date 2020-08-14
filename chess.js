@@ -1328,8 +1328,8 @@ function init() {
     document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
     document.getElementById("link").focus()
     document.getElementById("link").select()
-    document.execCommand("copy")
-    send_toast("send the link to your friend so they can play")
+    //document.execCommand("copy")
+    send_toast("it's your friend's turn! send the link to your friend so they can play")
   }
 
   document.getElementById("link").addEventListener("click", function() {
