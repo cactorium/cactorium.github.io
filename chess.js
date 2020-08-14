@@ -1169,16 +1169,18 @@ function confirm_move() {
 
   update_ui()
 
-  // save to localstorage
-  localStorage.setItem("game", encode_game(cur_game, playing_side))
+  if (!single_player) {
+    // save to localstorage
+    localStorage.setItem("game", encode_game(cur_game, playing_side))
 
-  // pop up a link or whatever
-  document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
-  document.getElementById("link").focus()
-  document.getElementById("link").select()
-  document.execCommand("copy")
+    // pop up a link or whatever
+    document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
+    document.getElementById("link").focus()
+    document.getElementById("link").select()
+    document.execCommand("copy")
 
-  send_toast("send the link to your friend so they can play")
+    send_toast("send the link to your friend so they can play")
+  }
 }
 
 function cancel_move() {
@@ -1303,6 +1305,11 @@ function init() {
     }
   }
 
+  const maybe_single_player = localStorage.getItem("single_player")
+  if (maybe_single_player != null) {
+    single_player = maybe_single_player == "yes"
+  }
+
   // if there is a message in the URI try to load it as a move
   // play as the currently active player
   if (window.location.hash.length > 1) {
@@ -1316,7 +1323,7 @@ function init() {
     }
   }
 
-  if (playing_side != active_side(cur_game)) {
+  if (!single_player && (playing_side != active_side(cur_game))) {
     const link_hash = encode_last_move(cur_game)
     document.getElementById("link").value = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
     document.getElementById("link").focus()
@@ -1324,6 +1331,11 @@ function init() {
     document.execCommand("copy")
     send_toast("send the link to your friend so they can play")
   }
+
+  document.getElementById("singleplayer").addEventListener("change", function() {
+    single_player = document.getElementById("singleplayer").checked
+    localStorage.setItem("single_player", single_player ? "yes" : "no")
+  })
 
   update_ui()
 }
