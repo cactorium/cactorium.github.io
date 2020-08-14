@@ -4,6 +4,17 @@
   <head>
     <title>Chess</title>
 <style>
+input[type="button"] {
+ border: 0;
+ background: grey;
+ font-size: 3vmin;
+ color: white;
+ box-shadow: none;
+ border-radius: 0px;
+}
+input[type="button"]:disabled {
+ background: lightgrey;
+}
 /* copied from https://www.w3schools.com/howto/howto_js_snackbar.asp */
  /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
@@ -77,7 +88,7 @@ table#chessboard tr td {
   margin: 0;
   text-align: center;
   vertical-align: middle;
-  font-size: 32px;
+  font-size: 6.8vmin;
   border-radius: 10%;
 }
 
@@ -130,6 +141,17 @@ window.onload = init
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         </tbody>
       </table>
+      <form>
+          <input type="button" id="newgame" value="new game"></input>
+          <input type="button" id="cancel" value="cancel move" disabled></input>
+          <input type="button" id="confirm" value="confirm move" disabled></input>
+          <br />
+          <input type="button" id="time_travel" value="<<" disabled></input>
+          <input type="button" id="peek_back" value="<" disabled></input>
+          <input type="button" id="peek_forward" value=">" disabled></input>
+          <input type="button" id="back_to_the_future" value=">>" disabled></input>
+
+      </form>
       </div>
       <div class="sidebar">
         <div>
@@ -137,20 +159,12 @@ window.onload = init
         <p>current move: <span id="current_move"></span></p>
         <p>selected move: <span id="selected_div"></span></p>
         <form>
-          <input type="button" id="newgame" value="new game"></input>
-          <input type="button" id="cancel" value="cancel move" disabled></input>
-          <input type="button" id="confirm" value="confirm move" disabled></input>
-          <br />
-          <p>link (send this to your friend so they can play): <input type="text" id="link"></input></p>
+          <p>link (send this to your friend so they can play): <input type="text" id="link" style="width:100%;"></input></p>
           <!-- TODO add support for exporting whole games -->
-          <p>export: <span type="text" id="long_lonk"></span></p>
+          <!-- <p>export: <span type="text" id="long_lonk"></span></p> -->
           <!-- TODO add a single/local player checkbox -->
         </form>
         <p>move list: <span id="movelist"></span></p>
-        <input type="button" id="time_travel" value="<<" disabled></input>
-        <input type="button" id="peek_back" value="<" disabled></input>
-        <input type="button" id="peek_forward" value=">" disabled></input>
-        <input type="button" id="back_to_the_future" value=">>" disabled></input>
         </div>
         <div id="promotion" class="invisible">
           select your promotion:
