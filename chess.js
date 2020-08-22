@@ -886,6 +886,9 @@ function decode_game(msg) {
   var tmp = new Game()
   for (var i = 0; i < move_len; i++) {
     const m = get_move_from_idx(tmp, msg_str.charCodeAt(i + 3))
+    if (m == null) {
+      return null
+    }
     ml += get_move_formatted(tmp, m)
     make_move_unchecked(tmp, m)
   }
@@ -1085,6 +1088,13 @@ function update_ui() {
 
   document.getElementById("playing_as").textContent = (playing_side == White) ? "white" : "black"
   document.getElementById("movelist").textContent = movelist
+
+  const import_same = encode_game(cur_game, playing_side)
+  const import_opposite = encode_game(cur_game, opposite_side(playing_side))
+  //const import_same_link = window.location.protocol + "//" + window.location.host + window.location.pathname + "#" + link_hash
+
+  document.getElementById("export_text_same").value = import_same
+  document.getElementById("export_text_opposite").value = import_opposite
 }
 
 function promotion_handler(typ) {
@@ -1356,6 +1366,14 @@ function init() {
   document.getElementById("link").addEventListener("click", function() {
     document.getElementById("link").select()
   })
+  document.getElementById("export_text_same").addEventListener("click", function() {
+    document.getElementById("export_text_same").select()
+  })
+  document.getElementById("export_text_opposite").addEventListener("click", function() {
+    document.getElementById("export_text_opposite").select()
+  })
+
+
 
   document.getElementById("singleplayer").addEventListener("change", function() {
     single_player = document.getElementById("singleplayer").checked
@@ -1364,6 +1382,30 @@ function init() {
   if (single_player) {
     document.getElementById("singleplayer").checked = true
   }
+  
+  document.getElementById("import").addEventListener("click", function() {
+    if (document.getElementById("import_text").value.length == 0) {
+      send_toast("you can't import any empty game")
+      return
+    }
+    // validate the import code
+    const maybe_imported_game = decode_game(document.getElementById("import_text").value.trim())
+    if (maybe_imported_game == null) {
+      alert("invalid game!")
+      document.getElementById("import_text").value = ""
+      return
+    }
+    if (confirm("Are you sure you want to import this game? This is remove any active game")) {
+      const [game, playing_as, ml] = maybe_imported_game 
+      cur_game = game
+      movelist = ml
+      playing_side = playing_as
+
+      localStorage.setItem("game", encode_game(cur_game, playing_side))
+      document.getElementById("import_text").value = ""
+      update_ui()
+    }
+  })
 
   update_ui()
 }

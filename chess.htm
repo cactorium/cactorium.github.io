@@ -5,9 +5,10 @@
     <title>Chess</title>
 <style>
 input[type="button"] {
+ margin-top: 0.5em;
  border: 0;
  background: grey;
- font-size: 3vmin;
+ font-size: 4vmin;
  color: white;
  box-shadow: none;
  border-radius: 0px;
@@ -171,8 +172,9 @@ window.onload = init
         <p>selected move: <span id="selected_div"></span></p>
         <form>
           <p>link (send this to your friend so they can play): <input type="text" id="link" style="width:100%;"></input></p>
-          <!-- TODO add support for exporting whole games -->
-          <!-- <p>export: <span type="text" id="long_lonk"></span></p> -->
+          <p>export (your side): <input type="text" id="export_text_same"></input></p>
+          <p>export (your opponent's side): <input type="text" id="export_text_opposite"></input></p>
+          <p>import: <input type="text" id="import_text" style="width:100%;"></input><input type="button" id="import" value="Import"></input></p>
           <!-- TODO add a single/local player checkbox -->
           <input type="checkbox" id="singleplayer">single player mode</input>
         </form>
