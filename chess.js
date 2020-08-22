@@ -709,6 +709,13 @@ function getMoveNotation(state, move) {
 
       attacker = is_attacked_by(tmp, move.dst.row, move.dst.col, piece_moved.typ, piece_moved.side)
     }
+    if ((piece_moved.typ == Pawn) && is_empty(state, move.dst.row, move.dst.col)) {
+      // clear attackers so that a pawn moving without a capture won't trigger this logic
+      // a neighboring pawn diagonally adjacent could act like an attacker without actually
+      // being able to move to the destination square
+      attackers = []
+    }
+
     if (attackers.length > 0) {
       // add something to disambiguate it
       const rowmatch = attackers.some(function(a) { a[0] == move.src.row })
@@ -945,6 +952,19 @@ function update_ui() {
 
   // act normally if we're not peeking at the past
   if (past_game == null) {
+
+    for (var j = 0; j < 8; j++) {
+      for (var i = 0; i < 8; i++) {
+        rows[j].children[i].classList.remove("last_move")
+      }
+    }
+    // highlight the last move made
+    if (cur_game.moves.length > 0) {
+      const last_move = cur_game.moves[cur_game.moves.length - 1]
+      rows[t(last_move.src.row)].children[t(last_move.src.col)].classList.add("last_move")
+      rows[t(last_move.dst.row)].children[t(last_move.dst.col)].classList.add("last_move")
+    }
+
     if (selected()) {
       if (selected_move == null) {
         for (var j = 0; j < 8; j++) {
@@ -996,6 +1016,7 @@ function update_ui() {
     // update the current move and selected move entries
     document.getElementById("current_move").textContent = (active_side(cur_game) == White) ? "white" : "black"
 
+
     const selected_div = document.getElementById("selected_div")
     if (selected_move != null) {
       if (active_side(cur_game) == White) {
@@ -1027,14 +1048,14 @@ function update_ui() {
     // basically just select the last move that was made 
     for (var j = 0; j < 8; j++) {
       for (var i = 0; i < 8; i++) {
-        rows[j].children[i].classList.remove("selected")
+        rows[j].children[i].classList.remove("last_move")
       }
     }
 
     if (past_game.moves.length > 0) {
       last_move = past_game.moves[past_game.moves.length - 1]
-      rows[t(last_move.src.row)].children[t(last_move.src.col)].classList.add("selected")
-      rows[t(last_move.dst.row)].children[t(last_move.dst.col)].classList.add("selected")
+      rows[t(last_move.src.row)].children[t(last_move.src.col)].classList.add("last_move")
+      rows[t(last_move.dst.row)].children[t(last_move.dst.col)].classList.add("last_move")
     }
 
     // also update current move

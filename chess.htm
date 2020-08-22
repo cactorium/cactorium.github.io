@@ -110,12 +110,22 @@ table#chessboard tr:nth-child(even) td:nth-child(even),
 
 table#chessboard tr:nth-child(even) td:nth-child(odd).selected,
     table#chessboard tr:nth-child(odd) td:nth-child(even).selected {
-  background-color: #555;
+  background-color: #050;
 }
 
 table#chessboard tr:nth-child(even) td:nth-child(even).selected,
     table#chessboard tr:nth-child(odd) td:nth-child(odd).selected {
-  background-color: #bbb;
+  background-color: #bfb;
+}
+
+table#chessboard tr:nth-child(even) td:nth-child(odd).last_move,
+    table#chessboard tr:nth-child(odd) td:nth-child(even).last_move {
+  background-color: #bb5;
+}
+
+table#chessboard tr:nth-child(even) td:nth-child(even).last_move,
+    table#chessboard tr:nth-child(odd) td:nth-child(odd).last_move {
+  background-color: #dd9;
 }
 
 
