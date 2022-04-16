@@ -28,7 +28,7 @@ It's a pretty simple buck converter down from 9V (or 5V from USB) to 3.3V, which
 Sending the 12-bit 48 kHz audio data directly from the MAX9860 would use way too much bandwidth, so we're going to need to use some compression/decompression happening to get it down to a reasonable bitrate.
 We're going to using the latest in low latency, lossy audio compression technology (that I think I can fit in this little 133 MHz process), `libcelt`!
 It uses a modified discrete cosine transform to transform the audio into the frequency domain, where it mercilessly quantizes the data based on frequency range using pyramid vector quantization, and what's left is encoded as tightly as possible using a range encoder.
-I just got the boards to successfully power up with catching fire so I'm really hoping this is performant enough on this little chip.
+I just got the boards to successfully power up without catching fire so I'm really hoping this is performant enough on this little chip.
 I'll probably be running the compressor on one core and the decompressor on the other to maintain full duplex communication
 
 The RP2040 doesn't have native support for I2S, but it does have PIO, which lets you write your own finite state machine that'll be running at main clock speed on some specified set of GPIO pins.
