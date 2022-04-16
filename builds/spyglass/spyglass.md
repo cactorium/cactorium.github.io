@@ -102,6 +102,8 @@ It turns out being less than a millimeter in diameter means it is very easy to b
 This means the little screws are effectively one time use, because there's no guarantee that the stress from the first use won't cause the screw to break when you try to reuse it.
 This happened several times, so now there's one broken screw stuck in the eyepiece that I'll eventually need to get out if anything breaks in it
 
+![Finished and polished](./shiny.jpg)
+
 # Further work, simulation and optimization
 Eventually I want to go back to this and build at least a better eyepiece assembly, because it seems like the eyepiece is the source of a lot of the aberrations in the image.
 I started working on modeling the system more accurately using `ray-optics`, a Python library developed by some apparently very famous member of the optical engineering community.
