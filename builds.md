@@ -1,15 +1,18 @@
 # Build logs
-- [capacitive linear sensor](./builds/linear-sensors/linear-sensors.md)
-- [engraved box](./builds/long-box/long-box.md)
-- [solder inspection microscope](./builds/microscope/microscope.md)
+- [(very WIP) knob-activated door lock](./builds/door-knab/knab.md)
+- [(kind of WIP) microscope stand](./builds/microscope-stand/stand.md)
+- [(WIP) 915 MHz walkie talkies](./builds/walkie-talkies/talkie-walkies.md)
+- [brass spyglass](./builds/spyglass/spyglass.md)
+- [hand plane repair](./builds/plane-frog/frog.md)
+- [(WIP) 915 MHz ISM transceiver](./builds/ism-transceiver/transceiver.md)
 - [144 MHz amplifier (for amateur radio stuff)](./builds/iss-amplifier/iss-amplifier.md)
-- [915 MHz ISM transceiver](./builds/ism-transceiver/transceiver.md)
-- TODO Bluetooth telegraph
-- TODO Chesster
-- TODO autoquartet
+- [solder inspection microscope](./builds/microscope/microscope.md)
+- [engraved box](./builds/long-box/long-box.md)
+- [capacitive linear sensor](./builds/linear-sensors/linear-sensors.md)
 
 # Working projects
 - [strobe tuner](./strobe-tuner/strobe.html) (NOTE: only works on HTTPS site because it needs permission to access audio, change the http in the address to https if it's not working)
+- [chess](./chess.htm) (two player mode using links only works if Local Storage is available)
 
 # Other things
 - [HP Pavilion Linux install notes](./notes/hp-pavilion-15/setup.md)
