@@ -54,4 +54,4 @@ I've worked around this so far by having a separate CMakeLists.txt in a subdirec
 
 Mistakes so far:
 - SPI pins for the AT86RF215 are wired backwards, should be an easy bodge job to fix it
-- The IS25SLP128F Flash chip does not seem to work with default settings with the RP2040. This is definitely a debuggable issue but I'm going to stick a pin in it to get to back to after I get this working
+- The IS25SLP128F Flash chip does not seem to work with default settings with the RP2040. This is definitely a debuggable issue but I'm going to stick a pin in it to get to back to after I get this working. I've switched to the W25Q128JVS in the meantime
