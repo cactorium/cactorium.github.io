@@ -85,24 +85,26 @@ Here's a few of the cooler shots during assembly:
 
 ![Pre assembly](./preassembly.jpg)
 
+![Dry fit](./dryfit.jpg)
+
 The inside of each tube was spray painted with black matte paint to reduce the amount of stray reflections.
 Some of that perfect black paint with carbon nanotubes or whatever in it would've been nice here
 
-![Dry fit](./dryfit.jpg)
+![Spray painted tubes](./spraypainted.jpg)
 
 It was so satisfying to polish the final surfaces down to an almost mirror finish.
 It kind of ruined the fit between the eyepiece tube and the middle assembly but it was totally worth it:
 
-![Full assembly extended](./finished-extended.jpg)
-
-![Finished closed](./finished-closed.jpg)
+![Finished and polished](./shiny.jpg)
 
 Like I mentioned before, these tiny screws ended up being mildly bothersome.
 It turns out being less than a millimeter in diameter means it is very easy to both strip the head and also just torque them so much they snap in half.
 This means the little screws are effectively one time use, because there's no guarantee that the stress from the first use won't cause the screw to break when you try to reuse it.
 This happened several times, so now there's one broken screw stuck in the eyepiece that I'll eventually need to get out if anything breaks in it
 
-![Finished and polished](./shiny.jpg)
+![Full assembly extended](./finished-extended.jpg)
+
+![Finished closed](./finished-closed.jpg)
 
 # Further work, simulation and optimization
 Eventually I want to go back to this and build at least a better eyepiece assembly, because it seems like the eyepiece is the source of a lot of the aberrations in the image.
@@ -121,12 +123,13 @@ So professional optical engineering work is done by feeding in approximate model
 
 To optimize a system I first need a way to score the system to measure its performance and provide feedback to drive the optimization.
 At the company I currently work for, the optics engineers use the RMS error of the rays hitting the image plane to determine optical quality.
+Ideally the lens system should focus the light into a single point, in practice you just try to get as close as that as you can.
 They'll simulate rays from various angles and different wavelengths and use a weighted score of the RMS errors of each scenario as the score function.
-If this error is less than the size of the Abbe disk, the system is considered diffraction limited and your image quality is basically limited by the physics of the system rather than by its design, weird wave effects start happening there and will crowd out the RMS error your ray tracer is giving you.
+If this error is less than the size of the Abbe disk, the system is considered diffraction limited and your image quality is basically limited by the physics of the system rather than by its design, weird wave effects start happening there and will crowd out the RMS error your ray-based model is giving you.
 I can generate the same score using `ray-optics`; it's already used in my focusing function to determine where the system's true focal point is.
 So given a set of rays traced from the object through the system to the calculated image plane, I can get a measurement of how clear the image is.
 
-So it turns out I need to optimize my optimizer.
+It turns out I also need to optimize the ray tracer to optimize better.
 I've tried some small experiments to brute force the optimal lens distances in my spyglass design, but the ray tracer is just too slow and makes iterating on the system too painful.
 Fortunately there was plenty of room to improve it without any algorithmic level changes, and I managed to get around a 30x speedup [here](https://git.threefortiethofonehamster.com/kelvin/spyglass/src/master/faster%20raytrace.ipynb).
 The original ray tracing function was made very generic so it could work with a (maybe too) large set of element designs.
