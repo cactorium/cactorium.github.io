@@ -29,11 +29,11 @@ If you can't guess all these are very complicated to model so I just bought the 
 The test stand's just some aluminum extrusion I had lying around with a bunch of 3D printed parts mounted to it.
 I'm working on eventually going back to this and redesigning the system the right way, using a properly optimized optical design and custom ground lenses, but I've got a lot more studying to do before that point.
 
-TODO test stand picture here
+![Test stand](./teststand.jpg)
 
 The image wasn't exactly _good_ but it looked old timey and you can kind of see stuff
 
-TODO test image here
+![Test image](./ahoycapn.jpg)
 
 ## More design
 The article above mentioned a lot about the construction of spyglasses, and I stole a lot of these ideas in this design.
@@ -41,7 +41,7 @@ I modeled the design in FreeCAD to make sure the dimensions line up correctly, t
 It ended up being a three tube design, using brass for the outer tubing and CNC milled acetal milled to act as the draws the tubes slide into each other on, and even more milled acetal to hold the lenses in place.
 Copper tubing was also used as spacers in the eyepiece assembly, and the various tapers in the assembly were there to hopefully help the parts center themselves when it was assembled.
 
-TODO spyglass model here
+![FreeCAD screenshot](./screenshot.png)
 
 The mounts for the lenses in the eyepiece were designed to form a stack that could be pushed into the eyepiece, screwed in place on one end, and then tightened down and screwed in place in the other.
 The objective lens mount ended up being a little more interesting. It consisted of a larger outer piece that fit on the outside of the brass tube but also had a small enough inner diameter to keep the objective lens from escaping, and an inner ring that would slide into place against the lens and provide pressure to keep it in place.
@@ -57,12 +57,13 @@ This precision was absolutely necessary because I needed to get a sliding fit be
 A lathe would've made things much easier and probably provided a better finish, but I've already invested way too much time into getting that CNC running so I needed to get some work out of it.
 
 TODO fixturing and CNC pics here
+![CNC pic 1](./cncpic.jpg)
 
 It turns out a big part of CNC milling is figuring out how to pack all the pieces together so they can be cut out with minimal waste.
 I managed to fit some of the parts for the smaller eyepiece tube assembly inside parts used by the objective tube assembly.
 All the parts were designed so they could be cut using only two mills, a 3mm end mill and a 45 degree chamfer end mill.
 
-TODO more complicated fixture here
+![CNC pic 2](./cncpic2.jpg)
 
 Most of the parts could be made using a one sided operation, but some of them needed operations on both sides.
 To do this, I needed a way to accurately maintain the position of the workpiece when it's flipped over for the second operation.
@@ -82,12 +83,19 @@ After polishing the logo turned out okay, but it was nowhere deep enough for the
 # Final assembly
 Here's a few of the cooler shots during assembly:
 
-TODO pictures here
+![Pre assembly](./preassembly.jpg)
+
+The inside of each tube was spray painted with black matte paint to reduce the amount of stray reflections.
+Some of that perfect black paint with carbon nanotubes or whatever in it would've been nice here
+
+![Dry fit](./dryfit.jpg)
 
 It was so satisfying to polish the final surfaces down to an almost mirror finish.
 It kind of ruined the fit between the eyepiece tube and the middle assembly but it was totally worth it:
 
-TODO pictures here
+![Full assembly extended](./finished-extended.jpg)
+
+![Finished closed](./finished-closed.jpg)
 
 Like I mentioned before, these tiny screws ended up being mildly bothersome.
 It turns out being less than a millimeter in diameter means it is very easy to both strip the head and also just torque them so much they snap in half.
