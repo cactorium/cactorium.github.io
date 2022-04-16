@@ -1,10 +1,10 @@
 # Build logs
 - [(very WIP) knob-activated door lock](./builds/door-knab/knab.md)
-- [(kind of WIP) microscope stand](./builds/microscope-stand/stand.md)
 - [(WIP) 915 MHz walkie talkies](./builds/walkie-talkies/talkie-walkies.md)
+- [Meiji microscope stand](./builds/microscope-stand/stand.md)
 - [brass spyglass](./builds/spyglass/spyglass.md)
-- [hand plane repair](./builds/plane-frog/frog.md)
 - [(WIP) 915 MHz ISM transceiver](./builds/ism-transceiver/transceiver.md)
+- [homemade overengineered nerf gun](./builds/nerf-gun/nerf.md)
 - [144 MHz amplifier (for amateur radio stuff)](./builds/iss-amplifier/iss-amplifier.md)
 - [solder inspection microscope](./builds/microscope/microscope.md)
 - [engraved box](./builds/long-box/long-box.md)
