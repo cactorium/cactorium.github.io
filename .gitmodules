@@ -4,3 +4,6 @@
 [submodule "resume"]
 	path = resume
 	url = https://github.com/cactorium/resume
+[submodule "wordle-solver"]
+	path = wordle-solver
+	url = https://git.threefortiethofonehamster.com/kelvin/wordle-solver.git
