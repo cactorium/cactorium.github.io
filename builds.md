@@ -12,6 +12,7 @@
 
 # Working projects
 - [wordle solver](./wordle-solver/wordle.htm)
+  - [wordle solver using WebAssembly](./wordle-solver/wordle-wasm.htm)
 - [strobe tuner](./strobe-tuner/strobe.html) (NOTE: only works on HTTPS site because it needs permission to access audio, change the http in the address to https if it's not working)
 - [chess](./chess.htm) (two player mode using links only works if Local Storage is available)
 
