@@ -1,6 +1,7 @@
 [submodule "strobe-tuner"]
 	path = strobe-tuner
 	url = https://github.com/cactorium/strobetuner-js
+  branch = master
 [submodule "resume"]
 	path = resume
 	url = https://github.com/cactorium/resume
