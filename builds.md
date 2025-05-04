@@ -18,3 +18,4 @@
 
 # Other things
 - [HP Pavilion Linux install notes](./notes/hp-pavilion-15/setup.md)
+- [Mycology notes](./notes/shrooms/shrooms.md)
